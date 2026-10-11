@@ -1,0 +1,6 @@
+# pnpm 11 refuses to install while a dependency's install script is neither allowed nor denied here.
+# esbuild and unrs-resolver only check (or download) their native binaries, which pnpm already installs
+# as optional platform packages, so their scripts stay disabled.
+allowBuilds:
+  esbuild: false
+  unrs-resolver: false

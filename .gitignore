@@ -1,0 +1,26 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# local databases (SQLite/libSQL)
+data/*.db
+data/*.db-*
+
+# environment
+.env
+.env*.local
+
+# testing
+coverage/
+test-results/
+playwright-report/
+blob-report/
+
+# misc
+.DS_Store
+.pnpm-debug.log*

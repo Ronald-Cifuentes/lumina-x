@@ -1,0 +1,60 @@
+{
+  "name": "lumina-real-estate",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LÚMINA — portafolio demostrativo de arriendos residenciales en Medellín y el Valle de Aburrá.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "packageManager": "pnpm@11.5.1",
+  "scripts": {
+    "dev": "next dev",
+    "predev": "pnpm --silent db:setup",
+    "build": "next build",
+    "start": "next start",
+    "prestart": "pnpm --silent db:setup",
+    "typecheck": "next typegen && tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx scripts/db.ts migrate",
+    "db:seed": "tsx scripts/db.ts seed",
+    "db:reset": "tsx scripts/db.ts reset",
+    "db:setup": "tsx scripts/db.ts setup",
+    "verify:data": "tsx scripts/db.ts verify",
+    "images:fetch": "tsx scripts/fetch-images.ts",
+    "admin:hash": "tsx scripts/admin-hash.ts",
+    "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm db:setup && pnpm verify:data && pnpm build && pnpm test:e2e"
+  },
+  "dependencies": {
+    "@libsql/client": "0.18.0",
+    "drizzle-orm": "0.45.4",
+    "lucide-react": "1.55.0",
+    "motion": "14.1.0",
+    "next": "16.4.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "0.0.1",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@next/env": "16.4.0",
+    "@playwright/test": "1.64.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "drizzle-kit": "0.31.11",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.4.0",
+    "sharp": "0.35.5",
+    "tailwindcss": "4.3.3",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "vitest": "5.0.3"
+  }
+}

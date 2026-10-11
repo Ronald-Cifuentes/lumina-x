@@ -1,0 +1,133 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ivory: #f6f2eb;
+  --color-ivory-deep: #ede6da;
+  --color-surface: #fffefa;
+  --color-charcoal: #20231f;
+  --color-charcoal-soft: #2b2f29;
+  --color-ink-muted: #5a5d57;
+  --color-bronze: #94775d;
+  --color-bronze-deep: #765c45;
+  --color-bronze-light: #c9ae93;
+  --color-sage: #7f8b7b;
+  --color-sage-deep: #56624f;
+  --color-line: rgb(32 35 31 / 0.14);
+  --color-line-strong: rgb(32 35 31 / 0.28);
+  --color-error: #9b3b2e;
+
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-scroll-cue: scroll-cue 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+
+  @keyframes scroll-cue {
+    0% {
+      transform: scaleY(0);
+      transform-origin: top;
+    }
+    45% {
+      transform: scaleY(1);
+      transform-origin: top;
+    }
+    55% {
+      transform: scaleY(1);
+      transform-origin: bottom;
+    }
+    100% {
+      transform: scaleY(0);
+      transform-origin: bottom;
+    }
+  }
+}
+
+@theme inline {
+  --font-serif: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+  --font-sans: var(--font-manrope), Manrope, ui-sans-serif, system-ui, sans-serif;
+}
+
+@utility shell {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 92rem;
+  padding-inline: max(1.25rem, 4vw);
+}
+
+@utility eyebrow {
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+@utility display {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 0.95;
+}
+
+@utility select-chevron {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2320231f' stroke-width='1.6'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.15rem center;
+  background-size: 1rem;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-ivory);
+    color: var(--color-charcoal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    min-height: 100dvh;
+    background-color: var(--color-ivory);
+    font-family: var(--font-sans);
+  }
+
+  ::selection {
+    background-color: rgb(148 119 93 / 0.28);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-bronze-deep);
+    outline-offset: 3px;
+  }
+
+  .on-dark :focus-visible {
+    outline-color: var(--color-bronze-light);
+  }
+
+  summary {
+    list-style: none;
+    cursor: pointer;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  dialog::backdrop {
+    background-color: rgb(32 35 31 / 0.55);
+  }
+
+  input[type='search']::-webkit-search-cancel-button {
+    appearance: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
