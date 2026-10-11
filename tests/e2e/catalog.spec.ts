@@ -62,8 +62,13 @@ test.describe('rental storefront', () => {
     await page.getByRole('navigation', { name: 'Paginación' }).getByRole('link', { name: 'Página 2' }).click();
     await expect(page).toHaveURL(/mascotas=si&orden=precio-desc&pagina=2#resultados$/);
     await expect(page.getByTestId('result-count')).toContainText(/mostrando 13–/);
-    const secondPage = await rents(page);
-    expect(Math.min(...firstPage)).toBeGreaterThanOrEqual(Math.max(...secondPage));
+    // Cards of the previous page keep their exit animation for a moment after the URL changes.
+    await expect
+      .poll(async () => {
+        const secondPage = await rents(page);
+        return secondPage.length === 12 && Math.max(...secondPage) <= Math.min(...firstPage);
+      })
+      .toBe(true);
     await page.goBack();
     await expect(page).toHaveURL(/mascotas=si&orden=precio-desc$/);
     await expect(page.getByTestId('result-count')).toContainText(/mostrando 1–12/);

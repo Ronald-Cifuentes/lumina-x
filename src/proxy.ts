@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { adminCookieName } from '@/features/admin/cookie';
+import { resolveSiteUrl } from '@/shared/config/site-url';
 
 const contentSecurityPolicy = (nonce: string, development: boolean, secure: boolean) =>
   [
@@ -26,7 +27,7 @@ const contentSecurityPolicy = (nonce: string, development: boolean, secure: bool
  */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const siteUrl = process.env.SITE_URL;
+  const siteUrl = resolveSiteUrl();
 
   if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login') && !request.cookies.has(adminCookieName(siteUrl))) {
     const login = request.nextUrl.clone();
@@ -37,7 +38,7 @@ export function proxy(request: NextRequest) {
   }
 
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
-  const policy = contentSecurityPolicy(nonce, process.env.NODE_ENV === 'development', (siteUrl ?? '').startsWith('https://'));
+  const policy = contentSecurityPolicy(nonce, process.env.NODE_ENV === 'development', siteUrl.startsWith('https://'));
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-nonce', nonce);
   requestHeaders.set('Content-Security-Policy', policy);

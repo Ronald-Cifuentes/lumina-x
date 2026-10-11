@@ -2,9 +2,8 @@ import { mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
+import { resolveDatabaseConfig } from './config';
 import * as schema from './schema';
-
-export const DEFAULT_DATABASE_URL = 'file:./data/lumina.db';
 
 const ensureLocalDirectory = (url: string) => {
   if (!url.startsWith('file:')) return;
@@ -24,9 +23,9 @@ export type Database = ReturnType<typeof createDatabase>;
 const globalForDatabase = globalThis as typeof globalThis & { luminaDatabase?: Database };
 
 export const getDatabase = (): Database => {
-  globalForDatabase.luminaDatabase ??= createDatabase(
-    process.env.DATABASE_URL || DEFAULT_DATABASE_URL,
-    process.env.DATABASE_AUTH_TOKEN || undefined,
-  );
+  if (!globalForDatabase.luminaDatabase) {
+    const { url, authToken } = resolveDatabaseConfig();
+    globalForDatabase.luminaDatabase = createDatabase(url, authToken);
+  }
   return globalForDatabase.luminaDatabase;
 };

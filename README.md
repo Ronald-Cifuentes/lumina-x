@@ -134,20 +134,29 @@ running it again never duplicates rows; `--reset` upserts canonical values.
 - **Known limit**: the per-client key comes from `X-Forwarded-For`. Without a trusted proxy that overwrites the header
   (Vercel does), a client can spoof it; the global per-form ceiling still bounds abuse.
 
-## Moving to a durable managed database
+## Deploying with a durable database (Vercel + Turso)
 
 The local SQLite file is for development and demos. Do **not** treat a SQLite file on an ephemeral or multi-instance
 deployment filesystem (Vercel, most containers) as production persistence: it is lost on redeploys and not shared
-between instances.
+between instances. On Vercel the app refuses it: `resolveDatabaseConfig` (`src/db/config.ts`) throws when `VERCEL` is
+set and the database URL is a `file:` URL, so the build stops with an explicit message instead of publishing pages
+that cannot load their data.
 
-The app already uses the libSQL client, so the recommended path is a managed libSQL database (for example Turso):
+The app uses the libSQL client, so the supported path is a managed libSQL database such as Turso:
 
-1. Create the database and an auth token with your provider.
-2. Set `DATABASE_URL=libsql://<database>.<region>.turso.io` and `DATABASE_AUTH_TOKEN=<token>` in the deployment
-   environment (and in a local shell when running the commands below).
-3. Apply migrations and load the catalogue once: `pnpm db:setup` (idempotent; safe to run on every release).
-4. Set `SITE_URL=https://your-domain`, `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH` and `WHATSAPP_BUSINESS_NUMBER`.
-5. Back up the database with the provider's point-in-time recovery or scheduled exports.
+1. Add the Turso integration from the Vercel Marketplace (project → Storage) and connect the database to the project.
+   The app reads `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` when `DATABASE_URL` is empty; any other libSQL provider
+   works through `DATABASE_URL` + `DATABASE_AUTH_TOKEN`, which take precedence.
+2. `vercel.json` sets the build command to `pnpm db:setup && pnpm build`, so every deployment applies pending
+   migrations and inserts missing canonical properties before building (idempotent; admin edits are kept). Preview
+   deployments use the same database when the variables are also defined for Preview.
+3. `SITE_URL` is optional on Vercel: without it, canonical URLs, Open Graph, the sitemap and secure cookies use the
+   project's production domain (`VERCEL_PROJECT_PRODUCTION_URL`). Set it when a custom domain is added.
+4. Optional: `ADMIN_EMAIL` + `ADMIN_PASSWORD_HASH` enable `/admin`; `WHATSAPP_BUSINESS_NUMBER` shows the WhatsApp button.
+5. Environment variables apply only to new deployments: redeploy after changing them.
+6. Back up the database with the provider's point-in-time recovery or scheduled exports.
+
+To run the database scripts against the remote database from a local shell, export the same variables first.
 
 To use PostgreSQL instead, port `src/db/schema.ts` to `drizzle-orm/pg-core`, switch the client in `src/db/client.ts`
 to a Postgres driver, regenerate migrations with drizzle-kit and keep the repositories unchanged (they only use
@@ -155,9 +164,10 @@ Drizzle's query builder; the `LIKE … ESCAPE` search and the rate-limit UPSERT 
 
 ## Testing and verification
 
-- **Unit/integration (Vitest, 78 tests)**: dataset integrity, idempotent seed, catalogue parsing and SQL semantics against a
+- **Unit/integration (Vitest, 83 tests)**: dataset integrity, idempotent seed, catalogue parsing and SQL semantics against a
   reference implementation, sorting and pagination, lead validation and persistence (including honeypot, rate limit and
-  failed writes), password hashing, sessions, rate limiting, formatting and structured data.
+  failed writes), password hashing, sessions, rate limiting, formatting, structured data, and the database/site URL
+  resolution used on Vercel.
 - **End-to-end (Playwright, desktop 1440×900 and Pixel 7)**: 50 routes from the sitemap return 200 with canonical tags;
   unknown slugs return 404; search + filters + sorting + pagination + history; favourites after reload; inquiry, visit,
   advisory and owner submissions verified directly in the database; invalid and honeypot submissions store nothing;

@@ -2,13 +2,13 @@ import './env';
 import { rm, stat } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { isNotNull, sql } from 'drizzle-orm';
-import { createDatabase, DEFAULT_DATABASE_URL } from '../src/db/client';
+import { createDatabase } from '../src/db/client';
+import { resolveDatabaseConfig } from '../src/db/config';
 import { countProperties, runMigrations, seedProperties } from '../src/db/maintenance';
 import { properties } from '../src/db/schema';
 
 const EXPECTED_PROPERTIES = 50;
-const url = process.env.DATABASE_URL || DEFAULT_DATABASE_URL;
-const authToken = process.env.DATABASE_AUTH_TOKEN || undefined;
+const { url, authToken } = resolveDatabaseConfig();
 const [command = 'setup', ...flags] = process.argv.slice(2);
 
 const describeTarget = () => (url.startsWith('file:') ? url : url.replace(/\/\/.*@/, '//***@'));

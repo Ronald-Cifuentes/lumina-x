@@ -26,6 +26,9 @@ Tailwind 4, Motion 14, Drizzle + libSQL (SQLite), Zod 4, Vitest 5 and Playwright
 - Never add a default admin password. Credentials come only from `ADMIN_EMAIL` + `ADMIN_PASSWORD_HASH`
   (`pnpm admin:hash`; the hash uses `:` separators because `$` is expanded in `.env` files).
 - Changing `src/db/schema.ts` requires `pnpm db:generate` and committing the new file in `drizzle/`.
+- Database URL/token come only from `resolveDatabaseConfig()` (`src/db/config.ts`: `DATABASE_*`, then the `TURSO_*`
+  names injected by the Vercel Turso integration; `file:` is refused on Vercel). The public origin comes only from
+  `resolveSiteUrl()` (`src/shared/config/site-url.ts`). `vercel.json` runs `pnpm db:setup` before every Vercel build.
 - Photos: add entries to `src/content/images/catalog.ts` (with Spanish alt text), then `pnpm images:fetch`.
 
 ## Next.js 16 specifics used here
